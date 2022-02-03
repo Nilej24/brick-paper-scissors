@@ -24,11 +24,11 @@ function computerPlay() {
 
 }
 
-function playRound(userSelection, computerSelection) {
+function playRound(playerSelection, computerSelection) {
 
 	let result
 
-	switch(userSelection) {
+	switch(playerSelection) {
 	
 		case "rock":
 
@@ -86,53 +86,77 @@ function playRound(userSelection, computerSelection) {
 	
 	}
 
-	if(result == "w")
-		return "you win"
-	else if(result == "l")
-		return "you lose, idiot"
-	else
-		return "draw"
+	return result;
 
 }
 
-function userPlay() {
+const playerScoreText = document.querySelector(".player-score");
+const computerScoreText = document.querySelector(".computer-score");
+const buttons = document.querySelectorAll("button");
+const playerMoveText = document.querySelector(".player-move");
+const computerMoveText = document.querySelector(".computer-move");
+const roundResultText = document.querySelector(".round-result");
+const gameResultText = document.querySelector(".game-result");
 
-	while(true) {
+let playerScore = 0;
+let computerScore = 0;
+
+buttons.forEach(function (button) {
+
+	button.addEventListener("click", function (ev) {
 	
-		let input = prompt("rock, paper, or scissors????")?.toLowerCase()
+		if(playerScore >= 5 || computerScore >= 5) return;
 
-		switch(input) {
+		const playerSelection = ev.target.innerText;
+		const computerSelection = computerPlay();
+
+		const result = playRound(playerSelection, computerSelection);
+		let resultMessage;
+
+		switch(result) {
 		
-			case "rock":
-			case "paper":
-			case "scissors":
-				return input
-			default:
-				console.log("enter an actual move lol")
-				
+			case "w":
+				resultMessage = "you win...";
+				playerScore++;
+				break;
+			case "l":
+				resultMessage = "you lose, idiot";
+				computerScore++;
+				break;
+			case "d":
+				resultMessage = "draw. so boring.";
+				break;
 		
 		}
-	
-	}
 
-}
+		playerScoreText.textContent = "you: " + playerScore;
+		computerScoreText.textContent = "computer: " + computerScore;
+		playerMoveText.textContent = `you played ${playerSelection}`;
+		computerMoveText.textContent = `computer played ${computerSelection}`;
+		roundResultText.textContent = resultMessage;
 
-function game() {
+		if(playerScore >= 5 || computerScore >= 5) {
+		
+			const winner = playerScore >= 5 ? "you" : "computer";
+			gameResultText.textContent = winner + " won the game by reaching 5 points, congrats bro !";
 
-	for(let i = 0; i < 5; i++) {
-	
-		const userSelection = userPlay()
-		console.log(`-- you played ${userSelection}`)
+			const resetButton = document.createElement("button");
+			resetButton.textContent = "reset";
+			resetButton.style.cssText = "display: block;";
+			resetButton.addEventListener("click", function (ev2) {
+			
+				playerScore = 0;
+				computerScore = 0;
+				playerScoreText.textContent = "you: 0";
+				computerScoreText.textContent = "computer: 0";
+				gameResultText.textContent = "";
+				ev2.target.remove();
+			
+			});
+			gameResultText.append(resetButton);
+		
+		}
 
-		const computerSelection = computerPlay()
-		console.log(`-- computer played ${computerSelection}`)
+	});
 
-		const result = playRound(userSelection, computerSelection)
-
-		console.log(result)
-	
-	}
-
-}
-
-game()
+});
